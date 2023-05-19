@@ -8,10 +8,12 @@
       :type="inputType"
       :id="id"
       class="input-modifer"
+      :class="{ 'input-disabled': disabled }"
       :placeholder="placeholder"
       :disabled="disabled"
       autocomplete="off"
       :autofocus="autofocus"
+      v-model="vmodelBindingValue"
     />
   </div>
 </template>
@@ -25,6 +27,7 @@ export default {
     User
   },
   props: {
+    modelValue: null,
     iconName: {
       type: String,
       default: null
@@ -49,6 +52,16 @@ export default {
       type: Boolean,
       default: false
     }
+  },
+  computed: {
+    vmodelBindingValue: {
+      get() {
+        return this.modelValue
+      },
+      set(val) {
+        this.$emit('update:modelValue', val)
+      }
+    }
   }
 }
 </script>
@@ -70,7 +83,7 @@ export default {
   pointer-events: none;
 }
 .input-icon {
-  color: #6b7280;
+  color: #ffffff;
   width: 1.25rem;
   height: 1.25rem;
 }
@@ -109,5 +122,9 @@ export default {
 
 .input-wraper:has(.input-modifer:not(:placeholder-shown), .input-modifer:focus) .input-icon {
   color: #ffffff;
+}
+
+.input-wraper:has(.input-disabled) .input-icon {
+  color: #6b7280;
 }
 </style>

@@ -1,15 +1,28 @@
 <template>
-  <button class="btn">
+  <button class="btn" :class="{ 'btn-disabled': disabled }" :disabled="disabled">
     Join Now
-    <ArrowRight />
+    <ArrowRight v-if="!submitting" />
+    <Spinner v-else />
   </button>
 </template>
 
 <script>
 import ArrowRight from './icons/ArrowRight.vue'
+import Spinner from './icons/Spinner.vue'
 export default {
+  props: {
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    submitting: {
+      type: Boolean,
+      default: false
+    }
+  },
   components: {
-    ArrowRight
+    ArrowRight,
+    Spinner
   }
 }
 </script>
@@ -30,12 +43,20 @@ export default {
   font-weight: 500;
   font-size: 16px;
   line-height: 24px;
-  /* identical to box height, or 150% */
   width: 100%;
   color: #667085;
 }
-.btn:hover {
+
+.btn:not(.btn-disabled) {
+  color: #ffffff;
+}
+
+.btn:not(.btn-disabled):hover {
   background: #21202b;
   color: #ffffff;
+}
+
+.btn-disabled {
+  cursor: not-allowed;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <main class="hdr">
-    <div>
+    <div class="main_form">
       <div class="img-holder__logo">
         <img src="@/assets/images/logo.webp" alt="logo of dezie.page" />
       </div>
@@ -12,6 +12,7 @@
           inputType="text"
           placeholder="Enter you name"
           :disabled="false"
+          v-model="name"
           :autofocus="true"
         />
         <Input
@@ -19,10 +20,16 @@
           id="email"
           inputType="email"
           placeholder="Enter you email"
-          :disabled="false"
+          v-model="email"
+          :disabled="!isNameValid"
         />
         <div>
-          <Button @click="open" />
+          <Button @click="postDetails" :disabled="!isEmailValid" :submitting="submitting" />
+        </div>
+        <div class="error" v-if="formSubmissionFailed">
+          There was some issue in submitting the details, we are already looking into it. please try
+          again later, do follow our <a href="https://twitter.com/DezinePage/">Twitter</a> handle
+          for updates
         </div>
       </div>
     </div>
@@ -30,7 +37,7 @@
       <img class="illustration" src="@/assets/images/illustration.webp" alt="illustration" />
     </div>
   </main>
-  <Modal />
+  <Modal :email="previousEmail" />
 </template>
 
 <script>
@@ -38,15 +45,67 @@ import Input from '@/components/Input.vue'
 import Button from '@/components/Button.vue'
 import Modal from '@/components/Modal.vue'
 import { openModal } from '@/utils/modalFunctions'
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
+import { logEvent } from 'firebase/analytics'
+import { db, analytics } from '@/utils/firebase'
+import { validateEmail } from '@/utils/helpers'
 export default {
   components: {
     Input,
     Button,
     Modal
   },
+  data() {
+    return {
+      collection_name: import.meta.env.VITE_collection_name,
+      name: '',
+      email: '',
+      previousEmail: '',
+      isNameValid: false,
+      isEmailValid: false,
+      submitting: false,
+      formSubmissionFailed: false
+    }
+  },
   methods: {
-    open() {
-      openModal('modal')
+    getRequestObject() {
+      return {
+        name: String(this.name),
+        email: String(this.email),
+        timeStamp: serverTimestamp()
+      }
+    },
+    resetFormData() {
+      this.previousEmail = this.email
+      this.name = ''
+      this.email = ''
+    },
+    async postDetails() {
+      const paylaod = this.getRequestObject()
+      this.submitting = true
+      try {
+        await addDoc(collection(db, this.collection_name), paylaod)
+        openModal('modal')
+        logEvent(analytics, 'joined_waitlist', { timeStamp: new Date().valueOf() })
+        this.resetFormData()
+      } catch (e) {
+        logEvent(analytics, 'unexpected_error', { timeStamp: new Date().valueOf() })
+        this.formSubmissionFailed = true
+      } finally {
+        this.submitting = false
+      }
+    }
+  },
+  watch: {
+    name(newName, oldName) {
+      const enteredName = String(newName)
+      if (enteredName.length > 2) this.isNameValid = true
+      else this.isNameValid = false
+    },
+    email(newEmail, oldEmail) {
+      const enteredEmail = String(newEmail)
+      if (enteredEmail.length > 2 && validateEmail(enteredEmail)) this.isEmailValid = true
+      else this.isEmailValid = false
     }
   }
 }
@@ -75,11 +134,24 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  animation: fadeInRight 0.8s ease-out;
+}
+
+.error {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 24px;
+  color: red;
+}
+
+.main_form {
+  animation: fadeInLeft 0.8s ease-out;
 }
 
 /*========== MEDIA QUERIES ==========*/
-@media screen and (min-width: 1024px) {
-}
 
 @media screen and (max-width: 960px) {
   .illustration {
@@ -102,8 +174,5 @@ export default {
   .illustration {
     width: calc(var(--illustration-width) * 0.5);
   }
-}
-
-@media screen and (max-width: 360px) {
 }
 </style>

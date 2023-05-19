@@ -3,13 +3,19 @@
     <h3 class="ftr-title">Follow Us For Exciting Updates</h3>
     <hr class="divider" />
     <ul class="socials">
-      <li class="social-link"><a href="https://www.instagram.com/dezinepage/">Instagram</a></li>
-      <li class="social-link"><a href="https://twitter.com/DezinePage/">Twitter</a></li>
       <li class="social-link">
-        <a href="https://www.facebook.com/people/DezinePage/100092513988158/">Facebook</a>
+        <a href="https://www.instagram.com/dezinepage/" target="_blank">Instagram</a>
       </li>
       <li class="social-link">
-        <a href="https://www.linkedin.com/company/dezine-page/">Linkedin</a>
+        <a href="https://twitter.com/DezinePage/" target="_blank">Twitter</a>
+      </li>
+      <li class="social-link">
+        <a href="https://www.facebook.com/people/DezinePage/100092513988158/" target="_blank"
+          >Facebook</a
+        >
+      </li>
+      <li class="social-link">
+        <a href="https://www.linkedin.com/company/dezine-page/" target="_blank">Linkedin</a>
       </li>
     </ul>
   </footer>
@@ -18,6 +24,7 @@
 <style scoped>
 .ftr {
   width: 100%;
+  animation: fadeInUp 0.8s ease-out;
 }
 
 .ftr-title {

@@ -1,16 +1,20 @@
 <template>
   <dialog id="modal">
     <div class="close"><Close @click="close" /></div>
-    <h1 class="modal-title">We've added you to our waiting list!</h1>
+    <h1 class="modal-title">
+      Thanks,<br />
+      we've added you to our waiting list!
+    </h1>
     <div class="modal-sub-title">
-      We'll let your Know when <span style="color: #ffffff">dezine.page</span> is ready
+      We'll let your Know when <span style="color: #ffffff">dezine.page</span> is ready.
     </div>
     <Input
       iconName="email"
       id="email"
       inputType="email"
       placeholder="Enter you email"
-      :disabled="false"
+      :disabled="true"
+      v-model="emailBindingValue"
     />
   </dialog>
 </template>
@@ -20,6 +24,22 @@ import Close from './icons/Close.vue'
 import Input from './Input.vue'
 import { closeModal } from '../utils/modalFunctions'
 export default {
+  props: {
+    email: {
+      type: String,
+      default: ''
+    }
+  },
+  computed: {
+    emailBindingValue: {
+      get() {
+        return this.email
+      },
+      set(val) {
+        this.$emit('update:modelValue', val)
+      }
+    }
+  },
   components: {
     Close,
     Input
